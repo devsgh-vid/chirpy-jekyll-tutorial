@@ -1,219 +1,256 @@
 # 🚀 Deploying a Professional Chirpy Jekyll Portfolio on GitHub Pages  
-### *For [devsgh-cloudsec.github.io](https://devsgh-cloudsec.github.io)*  
-Author: DevSingh ([devsgh-cloudsec](https://github.com/devsgh-cloudsec))  
+### Ubuntu 22.04 Desktop (Fresh Install – Beginner Friendly)
+
+Author: DevSingh (https://github.com/devsgh-cloudsec)  
 Last Updated: July 2025
 
 ---
 
 ## 📚 Table of Contents
-1. [Introduction](#introduction)
-2. [Overview & Requirements](#overview--requirements)
-3. [Step 1: Fork & Rename Chirpy Starter](#step-1-fork--rename-chirpy-starter)
-4. [Step 2: Local Setup by Platform](#step-2-local-setup-by-platform)
-    - [macOS Setup](#macos-setup)
-    - [Ubuntu GNOME Setup](#ubuntu-gnome-setup)
-    - [Windows Setup (WSL Recommended)](#windows-setup-wsl-recommended)
-5. [Step 3: Clone Repo & Install Gems](#step-3-clone-repo--install-gems)
-6. [Step 4: Run & Test Locally](#step-4-run--test-locally)
-7. [Step 5: GitHub Actions Deployment](#step-5-github-actions-deployment)
-8. [Step 6: Common Errors & Fixes](#step-6-common-errors--fixes)
-9. [Step 7: Custom Domain (Optional)](#step-7-custom-domain-optional)
-10. [Summary & Next Steps](#summary--next-steps)
+1. [System Setup (Ubuntu 22.04)](#1-system-setup-ubuntu-2204)
+2. [Install Git & Global Config](#2-install-git--global-config)
+3. [Install Ruby (via rbenv)](#3-install-ruby-via-rbenv)
+4. [Install Node.js (via NVM)](#4-install-nodejs-via-nvm)
+5. [Install Jekyll & Bundler](#5-install-jekyll--bundler)
+6. [Fork & Clone Chirpy Repository](#6-fork--clone-chirpy-repository)
+7. [Install Dependencies](#7-install-dependencies)
+8. [Run Your Site Locally](#8-run-your-site-locally)
+9. [Deploy via GitHub Actions](#9-deploy-via-github-actions)
+10. [Final Checks & Troubleshooting](#10-final-checks--troubleshooting)
 
 ---
 
-## 🧠 Introduction
-
-This guide walks you through deploying a **professional, production-grade Jekyll Chirpy site** on GitHub Pages, using your GitHub repo: `devsgh-cloudsec.github.io`.
-
-It includes:
-- Platform-specific setup for **macOS, Ubuntu, Windows**
-- A foolproof GitHub Actions deployment process
-- Troubleshooting of **real-world errors** like:
-  - Raw front matter rendering (`--- layout: home ---`)
-  - Broken workflows due to GitHub fork behavior
-
----
-
-## ⚙️ Overview & Requirements
-
-| Requirement        | Version/Tool          |
-|--------------------|-----------------------|
-| Ruby               | `3.2.x` (via rbenv)   |
-| Bundler            | `2.5.6`               |
-| Node.js (via NVM)  | `18.x`                |
-| Jekyll             | `4.3+`                |
-| GitHub Actions     | Required for deploy   |
-
----
-
-## 🪝 Step 1: Fork & Rename Chirpy Starter
-
-1. Fork the official starter:  
-   👉 https://github.com/cotes2020/chirpy-starter
-
-2. Rename the repo to:  
-   ```
-   devsgh-cloudsec.github.io
-   ```
-
-   ⚠️ This is required for GitHub Pages to auto-recognize it.
-
-3. **Important:**  
-   Forked repos **don’t auto-enable workflows**. You’ll fix that in [Step 5](#step-5-github-actions-deployment).
-
----
-
-## 💻 Step 2: Local Setup by Platform
-
-### macOS Setup
+## 1. ✅ System Setup (Ubuntu 22.04)
 
 ```bash
-brew install ruby rbenv
-brew install node
-brew install git
+sudo apt update && sudo apt upgrade -y
 
-# Add Ruby to path
-echo 'export PATH="/opt/homebrew/opt/ruby/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
+# Install essential dev tools & libraries
+sudo apt install -y git curl wget build-essential zlib1g-dev libssl-dev libreadline-dev libyaml-dev libffi-dev libgdbm-dev libncurses5-dev libgmp-dev libgmp-dev autoconf bison libgdbm-compat-dev libgmp-dev libsqlite3-dev
+
+# Fix locale issues
+sudo apt install -y locales
+sudo locale-gen en_US.UTF-8
 ```
 
-Then install:
+---
+
+## 2. ✅ Install Git & Global Config
+
 ```bash
-rbenv install 3.2.2
-rbenv global 3.2.2
-gem install bundler
+sudo apt install -y git
+
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
 ```
 
-### Ubuntu GNOME Setup
+---
+
+## 3. ✅ Install Ruby (via rbenv – Production Grade)
 
 ```bash
-sudo apt update && sudo apt install -y git curl   libssl-dev libreadline-dev zlib1g-dev autoconf bison   build-essential libyaml-dev libncurses5-dev libffi-dev libgdbm-dev
-
-# Install rbenv and ruby
+# Install rbenv and ruby-build
 git clone https://github.com/rbenv/rbenv.git ~/.rbenv
 echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
 echo 'eval "$(rbenv init - bash)"' >> ~/.bashrc
 source ~/.bashrc
 
 git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+
+# Install Ruby 3.2.2
 rbenv install 3.2.2
 rbenv global 3.2.2
-gem install bundler
+
+# Confirm
+ruby -v
 ```
-
-Install Node via NVM:
-```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-source ~/.bashrc
-nvm install 18
-nvm use 18
-nvm alias default 18
-```
-
-### Windows Setup (WSL Recommended)
-
-Install:
-- [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/)
-- Ubuntu via Microsoft Store
-
-Then follow the **Ubuntu GNOME setup** steps above inside WSL.
 
 ---
 
-## 📁 Step 3: Clone Repo & Install Gems
+## 4. ✅ Install Node.js (via NVM)
+
+```bash
+# Clean up old/broken installs first
+sudo apt remove -y nodejs npm
+sudo apt autoremove -y
+sudo rm -f /usr/bin/node /usr/bin/npm
+
+# Install NVM
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+source ~/.bashrc
+
+# Install Node 18 LTS
+nvm install 18
+nvm use 18
+nvm alias default 18
+
+# Confirm
+node -v
+npm -v
+```
+
+---
+
+## 5. ✅ Install Jekyll & Bundler
+
+```bash
+gem install bundler -v 2.5.6
+gem install jekyll
+```
+
+---
+
+## 6. ✅ Fork & Clone Chirpy Repository
+
+1. Go to: https://github.com/cotes2020/chirpy-starter  
+2. Click “Fork” → your GitHub account  
+3. Rename it to: `devsgh-cloudsec.github.io`
+
+Then clone locally:
 
 ```bash
 cd ~/Documents
 git clone https://github.com/devsgh-cloudsec/devsgh-cloudsec.github.io.git
 cd devsgh-cloudsec.github.io
-
-bundle install
 ```
 
 ---
 
-## 🔧 Step 4: Run & Test Locally
+## 7. ✅ Install Dependencies (Bundle Install)
 
 ```bash
-bundle exec jekyll serve
+# Set correct Ruby platform for GitHub Actions
+bundle _2.5.6_ lock --add-platform x86_64-linux
+
+# Clean install
+rm -rf .bundle Gemfile.lock
+bundle _2.5.6_ install
 ```
 
-Visit: [http://localhost:4000](http://localhost:4000)
+If you see errors like:
+- `json`, `ffi`, or `racc` native extensions failed:
+```bash
+gem pristine --all
+bundle _2.5.6_ install
+```
 
 ---
 
-## 🚀 Step 5: GitHub Actions Deployment
+## 8. ✅ Run Your Site Locally
 
-### Fix for Forked Repo (Workflow Doesn’t Run):
-Create this file:
+```bash
+bundle _2.5.6_ exec jekyll serve --livereload
+```
+
+Visit: http://localhost:4000
+
+You should see the Chirpy theme running locally.
+
+---
+
+## 9. ✅ Deploy via GitHub Actions (Not Branch!)
+
+### Setup Deployment Workflow
+
 ```bash
 mkdir -p .github/workflows
 
 nano .github/workflows/pages-deploy.yml
 ```
 
-Paste in the Chirpy GitHub Actions config (see GitHub docs or use template from previous assistant message).
+Paste this (official Chirpy deployment):
 
-Then push:
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - run: bundle install
+      - run: bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site/
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+Commit and push:
 
 ```bash
-git add .github/workflows/pages-deploy.yml
-git commit -m "Add GitHub Actions workflow for Chirpy deployment"
+git add .
+git commit -m "Enable GitHub Actions deployment for Chirpy"
 git push origin main
 ```
 
-Now go to GitHub → **Settings → Pages** → Set **Build Source: GitHub Actions**
+---
+
+### In GitHub UI:
+1. Go to `Settings → Pages`
+2. Under "Build & Deployment", choose:  
+   ✅ **Source: GitHub Actions**
+3. Save and wait for the build
 
 ---
 
-## ❌ Step 6: Common Errors & Fixes
+## 10. ✅ Final Checks & Troubleshooting
 
-### Raw Front Matter Shown (--- layout: home ---)
-✅ **Fix:** GitHub was rendering source instead of compiled HTML. This is why GitHub Actions is critical.
-
-### GitHub Actions Not Triggering
-✅ Fix: Forked repos don’t auto-run workflows — you solved this by committing a new `.yml` file.
-
-### Ruby Errors: Wrong Version
-✅ Fix: Installed `rbenv` + `ruby 3.2.2` (instead of Ubuntu default 3.0.2)
+- [x] Site builds locally? `bundle exec jekyll serve`
+- [x] GitHub Actions runs successfully? (green checkmark)
+- [x] `https://devsgh-cloudsec.github.io` shows Chirpy homepage?
 
 ---
 
-## 🌐 Step 7: Custom Domain (Optional)
+## 🧠 Common Fixes
 
-If using a custom domain like `devsingh.au` (VentraIP):
-
-1. Create a file called `CNAME` in the root of the repo:
-```
-devsingh.au
-```
-
-2. In VentraIP DNS, create:
-
-- `A` Records pointing to GitHub Pages IPs:  
-  ```
-  185.199.108.153  
-  185.199.109.153  
-  185.199.110.153  
-  185.199.111.153
-  ```
-
-- Optional: CNAME for `www` → `devsingh.au`
+| Issue | Fix |
+|-------|-----|
+| `--- layout: home ---` raw | GitHub Pages not building → Use Actions |
+| `nokogiri` fails | `apt install libxslt-dev libxml2-dev` |
+| `ffi`, `racc`, etc. fail | Run `gem pristine --all` |
 
 ---
 
-## ✅ Summary & Next Steps
+🎉 You’ve now deployed a **production-grade Jekyll blog** on GitHub Pages from a fresh Ubuntu install — with full control, CI/CD, and Chirpy's power.
 
-You now have:
-- ✅ A professional GitHub Pages site at [devsgh-cloudsec.github.io](https://devsgh-cloudsec.github.io)
-- ✅ Built with modern Jekyll + Ruby 3.2 + Bundler
-- ✅ GitHub Actions CI for repeatable builds
-- ✅ Ready to customize `_config.yml` with your profile, links, and content
-
-**Next:** Customize your `_config.yml`, add your avatar and posts, and publish your cloud security content!
+Maintain your `_config.yml`, posts, and GitHub Actions to grow your site over time.
 
 ---
 
-🛠️ Built and deployed by: [DevSingh](https://github.com/devsgh-cloudsec)  
-🎯 Maintained via: GitHub Actions | Jekyll | Chirpy Theme
+🛠 Maintained by: [DevSingh](https://github.com/devsgh-cloudsec)
